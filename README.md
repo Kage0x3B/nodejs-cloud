@@ -23,7 +23,7 @@ mysql -u username -p databasename < adminuser.sql
 
 Follow these Steps to get your node app on Port 3000 running:
 
-```
+```bash
 git clone https://github.com/flowluap/nodejs-cloud
 cd nodejs-cloud
 npm install
@@ -33,7 +33,7 @@ npm install
 
 Docfolder is the envoirement variable, that sets the path to the directory where all your files are saved
 Before starting the app, you have to specify some environment variables for the database connection and the folder where the uploaded files are stored. An easy way to do this is by creating a file called `.env` in the project root folder and adding the values there:
-```
+```dosini
 DOCFOLDER=C:\...\nodejs-cloud\storage\
 DB_HOST=127.0.0.1
 DB_PORT=3306
@@ -42,7 +42,7 @@ DB_PASSWORD=password
 DB_NAME=database_name
 ```
 Finally running the application is done with the command:
-```
+```bash
 node app.js
 ```
 
