@@ -219,8 +219,8 @@
 
                 <% for (i in files){%>
                 <div class="row py-1">
-                  <a href="/docstorage/<%= files[i].path.replace(process.env.DOCFOLDER,""); %>" download><i class="<%= files[i].icon %> fa-2x mx-3"></i></a>
-                  <a class="my-auto" href="/docstorage/<%= files[i].path.replace(process.env.DOCFOLDER,""); %>" download><%= files[i].name %></a>
+                  <a href="/storage/<%= files[i].path.replace(process.env.DOCFOLDER,""); %>" download><i class="<%= files[i].icon %> fa-2x mx-3"></i></a>
+                  <a class="my-auto" href="/storage/<%= files[i].path.replace(process.env.DOCFOLDER,""); %>" download><%= files[i].name %></a>
                   <div class="dropdown col show">
                       <a class="btn btn-sm float-right" href="#" role="button" id="dropdownMenuLink<%= files[i].name %>" data-flip="false" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="fas fa-ellipsis-h"></i>
