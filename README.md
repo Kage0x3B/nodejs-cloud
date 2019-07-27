@@ -2,7 +2,7 @@
 
 Store all your files on your nodejs Server. 
 
-![git verband](https://user-images.githubusercontent.com/49984289/57208400-e9096380-6fd3-11e9-958e-91ee239b3044.PNG)
+![nodejscloud](https://user-images.githubusercontent.com/49984289/61997375-129ccd00-b0a1-11e9-823d-41bf7ffffc5d.png)
 
 ## Getting Started
 
