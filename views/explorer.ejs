@@ -1,0 +1,325 @@
+<%- include('layout/head'); -%>
+<link rel="stylesheet" href="/public/css/dashboard.css">
+</head>
+
+<body>
+  <%- include('layout/navbar'); -%>
+  <%- include('layout/alerts'); -%>
+
+  <div class="container-fluid onePage py-5">
+    <div class="row">
+      <div class="col-md-3 ">
+        <%- include('layout/explorer_navbar'); -%>
+      </div>
+
+      <div class="col-md-9">
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6 border-right">
+                <h4>File Explorer</h4>
+              </div>
+
+            </div>
+          </div>
+        </div>
+        <div class="py-3 row"></div>
+        <div class="card">
+          <div class="card-body">
+            <nav aria-label="breadcrumb">
+              <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a>Home</a></li>
+                <% for (i in path.split("/")){%>
+                <% if (i != 0){ %>
+
+                <li class="breadcrumb-item"><a><%= path.split("/")[i] %></a></li>
+                <% }%>
+                <% }%>
+              </ol>
+            </nav>
+
+
+
+            <div class="modal fade" id="newfolder" tabindex="-1" role="dialog" aria-labelledby="newfolder" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Create new Folder</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <form id="createnewfolder" action="/explorer/actions/newfolder" method="post">
+                    <div class="modal-body">
+                      <div class="row">
+                        <input class="form-control col" name="path" type="text" value="<%= path %>/" readonly>
+                        <input id="foldername" class="form-control col" name="foldername" type="text" placeholder="Foldername">
+                      </div>
+                    </div>
+
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
+                  </form>
+                  <script>
+                    $(document).ready(function() {
+                      $('#newfolder').on('shown.bs.modal', function() {
+                          $('#foldername').focus();
+                      });
+                      $('.input').keypress(function (e) {
+                        if (e.which == 13 && $('#foldername').val() ) {
+                          $('form#createnewfolder').submit();
+                          return false;    //<---- Add this line
+                        }
+                      });
+                    });
+                  </script>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal fade" id="newfile" tabindex="-1" role="dialog" aria-labelledby="newfile" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">New Files</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+
+                  <form action="/explorer/actions/upload?path=/<%= path %>" method="post" enctype="multipart/form-data">
+                    <div class="modal-body">
+                      <div class="row">
+                        <input type="file" name="files" multiple>
+                        <input class="form-control col" name="path" type="text" value="<%= path %>/" hidden>
+                      </div>
+                      <p>*You can select multiple files</p>
+                    </div>
+
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-body" style="max-height:50vh; overflow-y:scroll;">
+                <div class="row">
+                  <button type="button" class="btn btn-outline-primary float-right" data-toggle="modal" data-target="#newfolder"><i class="fas fa-folder-plus"></i></button>
+                  <button type="button" class="btn btn-outline-primary float-right" data-toggle="modal" data-target="#newfile"><i class="fas fa-upload"></i></button>
+
+                </div>
+
+
+
+                <hr>
+                <div class="row">
+                  <a href="/explorer?path=/<%= pathback %>"><i class="fas fa-folder fa-2x mx-3"></i></a>
+                  <i class="fas fa-backward my-auto"></i>
+                </div>
+
+                <% for (i in folders){%>
+                <div class="row">
+                  <a href="/explorer?path=/<%= folders[i].path.replace(process.env.DOCFOLDER,"") %>"><i class="fas fa-folder fa-2x mx-3"></i></a>
+                  <a class="my-auto"><%= folders[i].name %></a>
+                  <div class="dropdown col show">
+                      <a class="btn btn-sm float-right" href="#" role="button" id="dropdownMenuLink<%= folders[i].name %>" data-flip="false" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-ellipsis-h"></i>
+                      </a>
+                      <div class="dropdown-menu" aria-labelledby="dropdownMenuLink<%= folders[i].name %>">
+                        <a title="Move folder" class="btn btn-danker dropdown-item"><i class="fas fa-angle-double-right"></i> Move (not working)</a>
+                        <a title="Edit folder" class="btn btn-danker dropdown-item" data-toggle="modal" data-target="#exampleModaledit<%= i %>"><i class="fas fa-pen"></i> Edit</a>
+                        <a title="Delete folder" class="btn btn-danker dropdown-item" data-toggle="modal" data-target="#exampleModal<%= i %>"><i class="fas fa-trash"></i> Delete </a>
+                      </div>
+                    </div>
+
+
+
+                  <!-- Löschen -->
+
+                  <div class="modal fade" id="exampleModal<%= i %>" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLongTitle">Delete Folder</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          Are you sure you want to delete the folder <b><%= folders[i].name %></b> ?
+                        </div>
+                        <div class="modal-footer">
+                            <form action="/explorer/actions/deletefolder" method="post" id="FormId<%= folders[i].name %>">
+                              <input class="form-control col" name="path" type="text" value="<%= path %>/" hidden>
+                              <input class="form-control col" name="name" type="text" value="<%= folders[i].name %>/" hidden>
+                            </form>
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                          <a><button id="LinkId<%= folders[i].name %>" type="button" class="btn btn-danger"><i class="fas fa-times"></i> Delete</button></a>
+                          <script>
+                            document.getElementById("LinkId<%= folders[i].name %>").onclick = function() {
+                              document.getElementById("FormId<%= folders[i].name %>").submit();
+                            }
+                          </script>
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Bearbeiten -->
+
+                  <div class="modal fade" id="exampleModaledit<%= i %>" tabindex="-1" role="dialog" aria-labelledby="newfolder" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLabel">Edit Folder</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <form action="/explorer/actions/renamefolder" method="post">
+                          <div class="modal-body">
+                            <div class="row">
+                              <input class="form-control col" name="path" type="text" value="<%= path %>/" readonly>
+                              <input class="form-control col" name="oldname" type="text" value="<%= folders[i].name %>/" hidden>
+                              <input id="foldername<%= i %>" class="form-control col" name="foldername" value="<%= folders[i].name %>" type="text" placeholder="Ordnername">
+                            </div>
+                          </div>
+
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Rename</button>
+                          </div>
+                        </form>
+                        <script>
+                          $(document).ready(function() {
+                            $('#exampleModaledit<%= i %>').on('shown.bs.modal', function() {
+                                $('#foldername<%= i %>').focus();
+                            });
+                            $('.input').keypress(function (e) {
+                              if (e.which == 13 && $('#foldername<%= i %>').val() ) {
+                                $('form#exampleModaledit<%= i %>').submit();
+                                return false;    //<---- Add this line
+                              }
+                            });
+                          });
+                        </script>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+                <% }%>
+
+                <% for (i in files){%>
+                <div class="row py-1">
+                  <a href="/docstorage/<%= files[i].path.replace(process.env.DOCFOLDER,""); %>" download><i class="<%= files[i].icon %> fa-2x mx-3"></i></a>
+                  <a class="my-auto" href="/docstorage/<%= files[i].path.replace(process.env.DOCFOLDER,""); %>" download><%= files[i].name %></a>
+                  <div class="dropdown col show">
+                      <a class="btn btn-sm float-right" href="#" role="button" id="dropdownMenuLink<%= files[i].name %>" data-flip="false" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-ellipsis-h"></i>
+                      </a>
+                      <div class="dropdown-menu" aria-labelledby="dropdownMenuLink<%= files[i].name %>">
+
+                        <a title="Move file" class="btn btn-danker dropdown-item"><i class="fas fa-angle-double-right"></i> Move (not working)</a>
+                        <a title="Edit file" class="btn btn-danker dropdown-item" data-toggle="modal" data-target="#fileedit<%= i %>"><i class="fas fa-pen"></i> Edit</a>
+                        <a title="Delete file" class="btn btn-danker dropdown-item" data-toggle="modal" data-target="#filedelete<%= i %>"><i class="fas fa-trash"></i> Delete</a>
+                      </div>
+                    </div>
+
+
+                  <!-- Löschen -->
+
+                  <div class="modal fade" id="filedelete<%= i %>" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLongTitle">Delete file</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          Are you sure you want to delete file <b><%= files[i].name %></b> ?
+                        </div>
+                        <div class="modal-footer">
+                            <form action="/explorer/actions/deletefile" method="post" id="FormId<%= files[i].name %>">
+                              <input class="form-control col" name="path" type="text" value="<%= path %>/<%= files[i].name %>" hidden>
+                            </form>
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                          <a><button id="LinkId<%= files[i].name %>" type="button" class="btn btn-danger"><i class="fas fa-times"></i> Delete</button></a>
+                          <script>
+                            document.getElementById("LinkId<%= files[i].name %>").onclick = function() {
+                              document.getElementById("FormId<%= files[i].name %>").submit();
+                            }
+                          </script>
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Bearbeiten -->
+
+                  <div class="modal fade" id="fileedit<%= i %>" tabindex="-1" role="dialog" aria-labelledby="newfolder" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLabel">Edit file</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <form action="/explorer/actions/renamefile" method="post">
+                          <div class="modal-body">
+                            <div class="row">
+                              <input class="form-control col" name="path" type="text" value="<%= path %>/" hidden>
+                              <input class="form-control col" name="oldname" type="text" value="<%= files[i].name %>/" hidden>
+                              <input id="filename<%= i %>" class="form-control col" name="filename" value="<%= files[i].name %>" type="text" placeholder="Dateiname">
+                            </div>
+                          </div>
+
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Rename</button>
+                          </div>
+                        </form>
+                        <script>
+                          $(document).ready(function() {
+                            $('#fileedit<%= i %>').on('shown.bs.modal', function() {
+                                $('#filename<%= i %>').focus();
+                            });
+                            $('.input').keypress(function (e) {
+                              if (e.which == 13 && $('#foldername<%= i %>').val() ) {
+                                $('form#fileedit<%= i %>').submit();
+                                return false;    //<---- Add this line
+                              }
+                            });
+                          });
+                        </script>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+                <% }%>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>

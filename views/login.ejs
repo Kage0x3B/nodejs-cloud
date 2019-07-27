@@ -1,0 +1,30 @@
+<%- include('layout/head'); -%>
+    <link rel="stylesheet" href="/public/css/login.css">
+</head>
+<body>
+  <%- include('layout/navbar'); -%>
+
+    <div class="container onePage">
+        <div class="card card-container">
+            <img id="profile-img" class="profile-img-card" src="/public/img/avatar.png" />
+            <p id="profile-name" class="profile-name-card"></p>
+            <form class="form-signin" action="/login" method="post">
+                <span id="reauth-email" class="reauth-email"></span>
+                <input type="text" name="username" value="<%= username %>" class="form-control" placeholder="Username" required autofocus>
+                <input type="password" name="password" value="<%= pass %>" class="form-control" placeholder="Password" required>
+
+                <button class="btn btn-lg btn-primary btn-block btn-signin" type="submit">Login</button>
+                <% if (err.length > 0) { %>
+                  <div class="alert alert-danger text-center"><%= err %></div>
+                <% } %>
+
+                <% if (msg.length > 0) { %>
+                  <div class="alert alert-success text-center"><%= msg %></div>
+                <% } %>
+            </form><!-- /form -->
+
+        </div><!-- /card-container -->
+    </div><!-- /container -->
+</body>
+
+</html>
