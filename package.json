@@ -9,6 +9,7 @@
     "busboy": "^0.3.1",
     "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.4",
+    "dotenv": "^8.0.0",
     "ejs": "^2.6.2",
     "express": "^4.17.1",
     "express-session": "^1.16.2",

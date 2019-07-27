@@ -10,6 +10,7 @@ cookieParser = require('cookie-parser'),
 helmet = require('helmet'),
 db = require('./routes/tools/db'),
 pp = require('./routes/tools/passport');
+require('dotenv').config();
 
 function ensureAuthenticated (req,res,next){
     if(req.isAuthenticated()){
